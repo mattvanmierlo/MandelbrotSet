@@ -1,4 +1,5 @@
 
+// Variables for Mandelbrot Set Program
 const maxiterations = 100;
 let slider1; 
 let slider2;
@@ -6,8 +7,8 @@ let slider3;
 let slider4;
 var xZoomGoal; // To the right of starting point
 var yZoomGoal; // To the bottom of starting point 
-var startZoomX;
-var startZoomY;
+var startZoomX; // Start click location
+var startZoomY; // End click location
 
 var xLeftRange = -1.5;
 var xRightRange = 1.5;
@@ -25,7 +26,7 @@ function f_of_z(za, zb, ca, cb){
 
 function setup() {
   frameRate(20);
-  createCanvas(500,500);
+  createCanvas(1000,1000);
   //slider1 = createSlider(-2,2,1.5,0.01);
   //slider1.position(20,20);
   //slider2 = createSlider(-2,2,1.5,0.01);
@@ -42,6 +43,9 @@ function mouseDragged(){
   xZoomGoal = mouseX;
   yZoomGoal = mouseY;
   
+  fill(0,255,0);
+  rect(startZoomX, startZoomY, xZoomGoal - startZoomX, yZoomGoal - startZoomY);
+
 }
 
 function mouseReleased(){
@@ -50,16 +54,18 @@ function mouseReleased(){
   print("End: " + [xZoomGoal, yZoomGoal]);
   
   // Remember the scaled position for later
-  var scaledX = map(startZoomX, 0, 500, xLeftRange, xRightRange);
-  var scaledY = map(startZoomY, 0, 500, yTopRange, yBottomRange);
+  var scaledX = map(startZoomX, 0, width, xLeftRange, xRightRange);
+  var scaledY = map(startZoomY, 0, width, yTopRange, yBottomRange);
   // Remember the scaled position for later
-  var scaled_x_end = map(xZoomGoal, 0, 500, xLeftRange, xRightRange);
-  var scaled_y_final = map(yZoomGoal, 0, 500, yTopRange, yBottomRange);
+  var scaled_x_end = map(xZoomGoal, 0, height, xLeftRange, xRightRange);
+  var scaled_y_final = map(yZoomGoal, 0, height, yTopRange, yBottomRange);
   
   xLeftRange = scaledX;
   xRightRange = scaled_x_end;
   yTopRange = scaledY;
   yBottomRange = scaled_y_final;
+  
+  draw();
   
 }
 
@@ -75,21 +81,23 @@ function draw() {
   
   loadPixels();
   // Row
-  for(let a = 0; a < 500; a++){
+  for(let a = 0; a < width; a++){
     // Column
-     for(let b = 0; b < 500; b++){
+     for(let b = 0; b < height; b++){
         // Row * # of Columns + Column
-        var index = a * 500 + b;
-        set(a, b, (255,255,255));
+        var index = a * width + b;
+        // set(a, b, (255,255,255));
         
         // f_n(z) = z^2 + c where c = a + bi
         // f_0(z) = 0
         var zReal = 0;
         var zImg = 0;
         
-        var scaledA = map(a, 0, 500, xLeftRange, xRightRange);
-        var scaledB = map(b, 0, 500, yTopRange, yBottomRange);
+        var scaledA = map(a, 0, width, xLeftRange, xRightRange);
+        var scaledB = map(b, 0, height, yTopRange, yBottomRange);
         
+        var isValid = true;
+        var final_round = 0;
         
         // When you square a complex number, you get...
         // a^2 + 2abi - b^2
@@ -102,8 +110,32 @@ function draw() {
           
           if(sqrt(pow(zReal, 2)+pow(zImg, 2)) > 2){
            //print(sqrt(pow(zReal, 2)+pow(zImg, 2)));
-           set(a, b, (round,round,round));
+           
+           
+           // Make cool color based on escape #
+           // TODO 
+           //print("Made it here");
+           
+           // set(a, b, (rangeMappedColor,rangeMappedColor, rangeMappedColor));
+           isValid = false;
            break; 
+          }
+          
+          final_round++;
+        }
+        
+        if(isValid == true){
+          
+          let rangeMappedColor = map(final_round, 0, maxiterations, 255, 0);
+          set(a, b, color(0, 0, 255));
+        }else{
+
+          let rangeMappedColor = map(final_round, 0, maxiterations, 0, 255+255);
+       
+          if(rangeMappedColor <= 255){
+            set(a, b, color(rangeMappedColor, 0, 0));
+          }else{
+            set(a, b, color(255, rangeMappedColor, 0));
           }
         }
         
@@ -112,5 +144,7 @@ function draw() {
   }
   
   updatePixels();
+  
+  noLoop();
 
 }
