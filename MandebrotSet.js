@@ -4,6 +4,15 @@ let slider1;
 let slider2;
 let slider3;
 let slider4;
+var xZoomGoal; // To the right of starting point
+var yZoomGoal; // To the bottom of starting point 
+var startZoomX;
+var startZoomY;
+
+var xLeftRange = -1.5;
+var xRightRange = 1.5;
+var yTopRange = -1.5;
+var yBottomRange = 1.5;
 
 function f_of_z(za, zb, ca, cb){
   
@@ -17,19 +26,50 @@ function f_of_z(za, zb, ca, cb){
 function setup() {
   frameRate(20);
   createCanvas(500,500);
-  slider1 = createSlider(-2,2,1.5,0.01);
-  slider1.position(20,20);
-  slider2 = createSlider(-2,2,1.5,0.01);
-  slider2.position(20,40);
-  slider3 = createSlider(-2,2,1.5,0.01);
-  slider3.position(20,60);
-  slider4 = createSlider(-2,2,1.5,0.01);
-  slider4.position(20,80);
-  
-  
+  //slider1 = createSlider(-2,2,1.5,0.01);
+  //slider1.position(20,20);
+  //slider2 = createSlider(-2,2,1.5,0.01);
+  //slider2.position(20,40);
+  //slider3 = createSlider(-2,2,1.5,0.01);
+  //slider3.position(20,60);
+  //slider4 = createSlider(-2,2,1.5,0.01);
+  //slider4.position(20,80);
 
 }
 
+function mouseDragged(){
+  
+  xZoomGoal = mouseX;
+  yZoomGoal = mouseY;
+  
+}
+
+function mouseReleased(){
+ 
+  print("Start: " + [startZoomX, startZoomY]);
+  print("End: " + [xZoomGoal, yZoomGoal]);
+  
+  // Remember the scaled position for later
+  var scaledX = map(startZoomX, 0, 500, xLeftRange, xRightRange);
+  var scaledY = map(startZoomY, 0, 500, yTopRange, yBottomRange);
+  // Remember the scaled position for later
+  var scaled_x_end = map(xZoomGoal, 0, 500, xLeftRange, xRightRange);
+  var scaled_y_final = map(yZoomGoal, 0, 500, yTopRange, yBottomRange);
+  
+  xLeftRange = scaledX;
+  xRightRange = scaled_x_end;
+  yTopRange = scaledY;
+  yBottomRange = scaled_y_final;
+  
+}
+
+
+function mousePressed(){
+  
+  startZoomX = mouseX;
+  startZoomY = mouseY;
+  
+}
 
 function draw() {
   
@@ -47,8 +87,8 @@ function draw() {
         var zReal = 0;
         var zImg = 0;
         
-        var scaledA = map(a, 0, 500, -slider1.value(), slider2.value());
-        var scaledB = map(b, 0, 500, -slider3.value(), slider4.value());
+        var scaledA = map(a, 0, 500, xLeftRange, xRightRange);
+        var scaledB = map(b, 0, 500, yTopRange, yBottomRange);
         
         
         // When you square a complex number, you get...
